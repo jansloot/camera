@@ -1,5 +1,17 @@
 <?php
 /**
+ * Camera
+ *
+ * PHP Version 7.0
+ *
+ * @link      https://github.com/jansloot/camera
+ * @copyright Copyright (c) 2018
+ * @license   GNU General Public License v2.0
+ */
+
+declare(strict_types=1);
+
+/**
  * If you need an environment-specific system or application configuration,
  * there is an example in the documentation
  * @see https://docs.zendframework.com/tutorials/advanced-config/#environment-specific-system-configuration

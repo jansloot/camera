@@ -1,0 +1,139 @@
+<table id="cameraTableContainer">
+    <tbody>
+    <tr>
+        <td>
+            <table id="column3">
+                <thead>
+                <tr>
+                    <th colspan="4">Cameras 3</th>
+                </tr>
+                <tr>
+                    <th>Number</th>
+                    <th>Name</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </td>
+        <td>
+            <table id="column5">
+                <thead>
+                <tr>
+                    <th colspan="4">Cameras 5</th>
+                </tr>
+                <tr>
+                    <th>Number</th>
+                    <th>Name</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </td>
+        <td>
+            <table id="column15">
+                <thead>
+                <tr>
+                    <th colspan="4">Cameras 3 &amp; 5</th>
+                </tr>
+                <tr>
+                    <th>Number</th>
+                    <th>Name</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </td>
+        <td>
+            <table id="columnOther">
+                <thead>
+                <tr>
+                    <th colspan="4">Cameras Overig</th>
+                </tr>
+                <tr>
+                    <th>Number</th>
+                    <th>Name</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<script>
+    const app = {};
+    const handler = {
+        set(target, key, value) {
+            target[key] = value;
+
+            if (target["map"] && target["cameras"] && !target["initialised"]) {
+                visualiseCameras(target);
+                target["initialised"] = true;
+            }
+        },
+    };
+    const p = new Proxy(app, handler);
+
+    function visualiseCameras(target) {
+        var bounds = new google.maps.LatLngBounds();
+
+        $(target.cameras).each(function(index, camera) {
+            let marker = new google.maps.Marker({
+                position: {lat: camera.latitude, lng: camera.longitude},
+                map: target.map,
+                title: camera.name,
+            });
+
+            bounds.extend(marker.getPosition())
+        });
+
+        target.map.fitBounds(bounds);
+    }
+
+    $.ajax('/camera/list')
+        .done(function(data) {
+            $(data.cameras).each(function(index, camera) {
+                p.cameras = data.cameras;
+                let table = "table#columnOther";
+
+                if (camera.number % 15 === 0) {
+                    table = "table#column15";
+                } else if (camera.number % 3 === 0) {
+                    table = "table#column3";
+                } else if (camera.number % 5 === 0) {
+                    table = "table#column5";
+                }
+
+                $(table).find('tbody')
+                    .append($('<tr>')
+                        .append($('<td>').append(camera.number))
+                        .append($('<td>').append(camera.name))
+                        .append($('<td>').append(camera.latitude))
+                        .append($('<td>').append(camera.longitude))
+                    );
+            });
+        }
+    );
+
+    function initMap() {
+        p.map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 14,
+            center: {lat: 52.091627, lng: 5.119383}
+        });
+
+    }
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAAcaTqZ8tWM81oQHQMoaQfRgGoOpy9Ivc&callback=initMap"></script>

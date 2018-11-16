@@ -1,0 +1,11 @@
+/**
+ * Camera
+ *
+ * PHP Version 7.0
+ *
+ * @link      https://github.com/jansloot/camera
+ * @copyright Copyright (c) %year%
+ * @license   GNU General Public License v2.0
+ */
+
+declare(strict_types=1);

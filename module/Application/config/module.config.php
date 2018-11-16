@@ -1,15 +1,21 @@
 <?php
 /**
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * Camera
+ *
+ * PHP Version 7.0
+ *
+ * @link      https://github.com/jansloot/camera
+ * @copyright Copyright (c) 2018
+ * @license   GNU General Public License v2.0
  */
+
+declare(strict_types=1);
 
 namespace Application;
 
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
-use Zend\ServiceManager\Factory\InvokableFactory;
+use Application\Repository;
 
 return [
     'router' => [
@@ -19,18 +25,35 @@ return [
                 'options' => [
                     'route'    => '/',
                     'defaults' => [
-                        'controller' => Controller\IndexController::class,
+                        'controller' => Controller\CameraController::class,
                         'action'     => 'index',
                     ],
                 ],
             ],
-            'application' => [
+            'camera' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/application[/:action]',
+                    'route'    => '/camera[/:action]',
                     'defaults' => [
-                        'controller' => Controller\IndexController::class,
+                        'controller' => Controller\CameraController::class,
                         'action'     => 'index',
+                    ],
+                ],
+            ],
+        ],
+    ],
+    'console' => [
+        'router' => [
+            'routes' => [
+                'search-cameras' => [
+                    'type'    => 'simple',
+                    // types below
+                    'options' => [
+                        'route'    => 'search --name=',
+                        'defaults' => [
+                            'controller' => Controller\CommandLineSearchController::class,
+                            'action'     => 'index',
+                        ],
                     ],
                 ],
             ],
@@ -38,7 +61,13 @@ return [
     ],
     'controllers' => [
         'factories' => [
-            Controller\IndexController::class => InvokableFactory::class,
+            Controller\CameraController::class => Controller\Factory\CameraControllerFactory::class,
+            Controller\CommandLineSearchController::class => Controller\Factory\CommandLineSearchControllerFactory::class
+        ],
+    ],
+    'service_manager' => [
+        'factories' => [
+            Repository\CameraRepository::class => Repository\Factory\CameraRepositoryFactory::class,
         ],
     ],
     'view_manager' => [
@@ -55,6 +84,9 @@ return [
         ],
         'template_path_stack' => [
             __DIR__ . '/../view',
+        ],
+        'strategies' => [
+            'ViewJsonStrategy',
         ],
     ],
 ];
